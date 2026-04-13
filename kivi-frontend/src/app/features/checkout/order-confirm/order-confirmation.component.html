@@ -1,0 +1,63 @@
+<div class="container page-content">
+    <app-loading *ngIf="loading" />
+
+    <div *ngIf="order && !loading" class="confirm-wrap fade-in-up">
+
+        <!-- Success banner -->
+        <div class="confirm-banner">
+            <div class="confirm-icon">✓</div>
+            <div>
+                <h1>Order Confirmed!</h1>
+                <p>Thank you for your order. Your purchase is being processed.</p>
+            </div>
+        </div>
+
+        <!-- Order card -->
+        <div class="confirm-card">
+            <div class="confirm-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Order ID</span>
+                    <span class="meta-value">#{{ order.id }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date</span>
+                    <span class="meta-value">{{ order.placedAt | date:'mediumDate' }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Payment</span>
+                    <span class="meta-value">{{ order.paymentMethod }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Total</span>
+                    <span class="meta-value total">{{ order.totalAmount | currency:'INR':'symbol':'1.2-2' }}</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3>Items Purchased</h3>
+            <div class="confirm-items">
+                <div class="confirm-item" *ngFor="let item of order.items">
+                    <span class="ci-name">{{ item.productName }}</span>
+                    <span class="ci-qty">× {{ item.quantity }}</span>
+                    <span class="ci-price">
+                        {{ (item.priceAtPurchase * item.quantity) | currency:'INR':'symbol':'1.2-2' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="confirm-footer-total">
+                <span>Total Paid</span>
+                <span>{{ order.totalAmount | currency:'INR':'symbol':'1.2-2' }}</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="confirm-actions">
+            <a routerLink="/orders" class="btn btn-outline">View All Orders</a>
+            <a routerLink="/products" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+
+    <div *ngIf="error && !loading" class="alert alert-error">{{ error }}</div>
+</div>

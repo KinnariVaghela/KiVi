@@ -1,0 +1,76 @@
+<div class="container page-content">
+    <div class="page-header">
+        <h1>My Profile</h1>
+    </div>
+
+    <div class="profile-layout">
+
+        <!-- Edit Profile -->
+        <div class="profile-card card">
+            <div class="card-head">
+                <div class="avatar">{{ initial }}</div>
+                <div>
+                    <h2>{{ profile?.name }}</h2>
+                    <p class="role-tag">{{ profile?.role | titlecase }}</p>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="alert alert-success" *ngIf="profileSuccess">{{ profileSuccess }}</div>
+            <div class="alert alert-error" *ngIf="profileError">{{ profileError }}</div>
+
+            <form (ngSubmit)="saveProfile()">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" [(ngModel)]="profileForm.name" name="name" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" [(ngModel)]="profileForm.email" name="email" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" [(ngModel)]="profileForm.phone" name="phone" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea [(ngModel)]="profileForm.address" name="address" class="form-textarea"
+                        rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="savingProfile">
+                    {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+                </button>
+            </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="profile-card card">
+            <h2>Change Password</h2>
+            <p class="section-desc">Your current password is required to set a new one.</p>
+
+            <div class="divider"></div>
+
+            <div class="alert alert-success" *ngIf="pwSuccess">{{ pwSuccess }}</div>
+            <div class="alert alert-error" *ngIf="pwError">{{ pwError }}</div>
+
+            <form (ngSubmit)="changePassword()">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" [(ngModel)]="pwForm.current" name="current" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" [(ngModel)]="pwForm.newPw" name="newPw" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" [(ngModel)]="pwForm.confirm" name="confirm" class="form-input" />
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="savingPw">
+                    {{ savingPw ? 'Updating...' : 'Update Password' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

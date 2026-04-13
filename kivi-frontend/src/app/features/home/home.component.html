@@ -1,0 +1,224 @@
+<!-- TICKER -->
+<div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker-track">
+        <span *ngFor="let t of ticker">{{ t }}</span>
+    </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-dots" aria-hidden="true"></div>
+    <div class="hero-accent-bar" aria-hidden="true"></div>
+
+    <div class="hero-inner container">
+
+        <!-- LEFT -->
+        <div class="hero-left">
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                Welcome to KiVi
+            </div>
+
+            <h1 class="headline">
+                Discover<br>
+                <em class="headline-em">products</em><br>
+                <span class="headline-light">worth owning.</span>
+            </h1>
+
+            <p class="hero-sub">
+                Curated selections across electronics, stationery, furniture and more —
+                quality you can trust, at prices that make sense.
+            </p>
+
+            <div class="hero-ctas">
+                <a routerLink="/products" class="btn-gold">
+                    Shop Collection
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </a>
+                <a routerLink="/products" [queryParams]="{inStock:'true'}" class="btn-outline">In Stock Only</a>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="hero-right">
+
+            <div class="video-frame">
+                <span class="frame-label">Featured Product</span>
+                <video 
+                    autoplay 
+                    muted 
+                    loop 
+                    playsinline 
+                    preload="auto"
+                    [muted]="true"
+                    class="frame-video">
+                    <source src="assets/hero-background.mp4" type="video/mp4">
+                    </video>
+                <div class="frame-strip">
+                    <span class="frame-product-name">Studio Setup</span>
+                    <span class="frame-product-price">₹1,00,000</span>
+                </div>
+            </div>
+
+            <!-- Category strip -->
+            <div class="cat-strip" *ngIf="!loadingTaxonomy && taxonomy.length > 0">
+                <a *ngFor="let type of taxonomy.slice(0, 4); let i = index" routerLink="/products"
+                    [queryParams]="{typeId: type.id}" class="cat-chip" [class.cat-chip--active]="i === 0">{{ type.name
+                    }}</a>
+            </div>
+
+            <!-- Trust signals -->
+            <div class="trust-row">
+                <span class="trust-item">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                        stroke-width="1.4">
+                        <path d="M8 2L3 4.5v4C3 11 5.5 13.5 8 14c2.5-.5 5-3 5-5.5v-4L8 2z" />
+                        <polyline points="5.5 8 7 9.5 11 6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Secure checkout
+                </span>
+                <span class="trust-sep"></span>
+                <span class="trust-item">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                        stroke-width="1.4">
+                        <rect x="1" y="6" width="10" height="8" rx="1" />
+                        <path d="M11 9h2l2 2v3h-4" />
+                        <circle cx="4" cy="14" r="1.2" />
+                        <circle cx="13" cy="14" r="1.2" />
+                    </svg>
+                    Free shipping
+                </span>
+                <span class="trust-sep"></span>
+                <span class="trust-item">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                        stroke-width="1.4">
+                        <path d="M3 7l-2 2 2 2M13 7l2 2-2 2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M1 9h14" stroke-linecap="round" />
+                    </svg>
+                    30-day returns
+                </span>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED -->
+<section class="section section-cream">
+    <div class="container">
+        <div class="section-eyebrow">
+            <div class="rule"></div><span>Featured</span>
+            <div class="rule"></div>
+        </div>
+        <div class="section-head">
+            <h2 class="section-title">Handpicked for you</h2>
+            <a routerLink="/products" class="see-all">View all
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            </a>
+        </div>
+        <app-loading *ngIf="loadingFeatured" />
+        <div *ngIf="!loadingFeatured && featured.length === 0" class="empty-note">
+            <p>No featured products yet.</p>
+        </div>
+        <div *ngIf="!loadingFeatured && featured.length > 0" class="product-grid">
+            <app-product-card *ngFor="let p of featured; let i = index" [product]="p" [showAddToCart]="auth.isCustomer"
+                [adding]="addingId === p.id" [quantity]="cartQty(p.id)" [style.animation-delay]="(i * 0.07) + 's'"
+                class="card-anim" (addToCart)="onAddToCart($event)" (decrease)="onDecrease($event)" />
+        </div>
+        <div class="center-row" style="margin-top:48px">
+            <a routerLink="/products" class="btn-outline">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section section-white">
+    <div class="container">
+        <div class="section-eyebrow">
+            <div class="rule"></div><span>Browse</span>
+            <div class="rule"></div>
+        </div>
+        <h2 class="section-title" style="margin-bottom:48px">Shop by category</h2>
+        <app-loading *ngIf="loadingTaxonomy" />
+        <div *ngIf="!loadingTaxonomy && taxonomy.length > 0" class="cat-grid">
+            <a *ngFor="let type of taxonomy; let i = index" routerLink="/products" [queryParams]="{typeId: type.id}"
+                class="cat-card" [class.cat-card--featured]="i === 0">
+                <div class="cat-glow"></div>
+                <h3 class="cat-name">{{ type.name }}</h3>
+                <p class="cat-count">{{ type['categories'].length || 0 }} categories</p>
+                <div class="cat-cta">
+                    Explore
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section class="section section-cream">
+  <div class="container">
+    <div class="section-eyebrow">
+      <div class="rule"></div><span>Why KiVi</span>
+      <div class="rule"></div>
+    </div>
+    <h2 class="section-title" style="text-align:center;margin-bottom:56px">Shopping, the way it should be</h2>
+    <div class="values-grid">
+      <div class="value-card" *ngFor="let v of values; let i = index" [style.animation-delay]="(i*0.08)+'s'">
+        <div class="value-index">0{{ i + 1 }}</div>
+        <div class="value-icon-wrap">
+          <svg *ngIf="v.key === 'secure'" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M8 2L3 4.5v4C3 11 5.5 13.5 8 14c2.5-.5 5-3 5-5.5v-4L8 2z"/>
+            <polyline points="5.5 8 7 9.5 11 6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg *ngIf="v.key === 'delivery'" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M2 8h10M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1v-2" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="v.key === 'returns'" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M2 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 2v9a3 3 0 003 3h5" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="v.key === 'support'" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M14 10.5a2 2 0 01-2 2H5l-3 2V4a2 2 0 012-2h8a2 2 0 012 2v6.5z" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="5" y1="7" x2="11" y2="7" stroke-linecap="round"/>
+            <line x1="5" y1="10" x2="8" y2="10" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="value-title">{{ v.title }}</h3>
+        <p class="value-desc">{{ v.desc }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="section-cta">
+    <div class="cta-geo" aria-hidden="true"></div>
+    <div class="container cta-body">
+        <div class="cta-pill">Join KiVi &middot; Est. 2026</div>
+        <h2 class="cta-headline">
+            Your next favourite<br><em>purchase awaits.</em>
+        </h2>
+        <p class="cta-sub">Create a free account and enjoy a seamless shopping experience.</p>
+        <div class="cta-btns">
+            <a routerLink="/auth/register" class="btn-gold btn-gold--lg">
+                Create Account
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            </a>
+            <a routerLink="/products" class="btn-outline btn-outline--light">Browse First</a>
+        </div>
+    </div>
+</section>

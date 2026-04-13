@@ -1,0 +1,41 @@
+<div class="admin-page">
+    <div class="admin-page-header">
+        <div>
+            <h1>All Orders</h1>
+            <p class="admin-subtitle">{{ orders.length }} total orders</p>
+        </div>
+    </div>
+
+    <app-loading *ngIf="loading" />
+
+    <div *ngIf="!loading" class="table-wrapper fade-in">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let o of orders">
+                    <td><strong>#{{ o.id }}</strong></td>
+                    <td>{{ o.user?.name ?? o.userId }}</td>
+                    <td>{{ o.placedAt | date:'mediumDate' }}</td>
+                    <td>{{ o.paymentMethod }}</td>
+                    <td><strong>{{ o.totalAmount | currency:'INR':'symbol':'1.2-2' }}</strong></td>
+                    <td>
+                        <a [routerLink]="['/admin/orders', o.id]" class="btn btn-ghost btn-sm">View</a>
+                    </td>
+                </tr>
+                <tr *ngIf="orders.length === 0 && !loading">
+                    <td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:32px;">No orders yet.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="admin-page">
+    <div class="admin-page-header">
+        <div>
+            <h1>Customers</h1>
+            <p class="admin-subtitle">{{ filtered.length }} of {{ customers.length }} customers</p>
+        </div>
+        <input type="text" class="form-input search-input" placeholder="Search by name or email..."
+            [(ngModel)]="search" />
+    </div>
+
+    <app-loading *ngIf="loading" />
+
+    <div *ngIf="!loading" class="table-wrapper fade-in">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let c of filtered">
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.phone ?? '—' }}</td>
+                    <td>{{ c.createdAt | date:'mediumDate' }}</td>
+                    <td>
+                        <span class="status-badge" [class.locked]="c.isLocked">
+                            {{ c.isLocked ? 'Locked' : 'Active' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" [class.btn-ghost]="!c.isLocked" [class.unlock-btn]="c.isLocked"
+                            (click)="toggleLock(c)">
+                            {{ c.isLocked ? 'Unlock' : 'Lock' }}
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="filtered.length === 0">
+                    <td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:32px;">
+                        No customers found.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

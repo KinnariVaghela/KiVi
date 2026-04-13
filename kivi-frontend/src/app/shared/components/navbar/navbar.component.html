@@ -1,0 +1,71 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="nav-inner container">
+        <a routerLink="/" class="nav-brand">
+            <span class="brand-ki">Ki</span><span class="brand-vi">Vi</span>
+        </a>
+        <form class="nav-search" (ngSubmit)="onSearch()">
+            <input type="text" class="nav-search-input" placeholder="Search products..." [(ngModel)]="searchQuery"
+                name="search" />
+            <button type="submit" class="nav-search-btn" aria-label="Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+            </button>
+        </form>
+        <div class="nav-actions">
+            <a routerLink="/products" class="nav-link" routerLinkActive="active">Shop</a>
+            <a *ngIf="auth.isCustomer" routerLink="/cart" class="nav-cart-btn" aria-label="Cart">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <span *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+            </a>
+            <div *ngIf="auth.isLoggedIn" class="user-menu" [class.open]="menuOpen">
+                <button class="user-btn" (click)="toggleMenu()">
+                    <span class="user-avatar">{{ userInitial }}</span>
+                    <span class="user-name">{{ auth.currentUser?.name?.split(' ')?. [0] }}</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="dropdown" *ngIf="menuOpen" (click)="menuOpen = false">
+                    <a *ngIf="auth.isAdmin" routerLink="/admin" class="dropdown-item">Admin Panel</a>
+                    <a *ngIf="auth.isCustomer" routerLink="/orders" class="dropdown-item">My Orders</a>
+                    <a *ngIf="auth.isCustomer" routerLink="/profile" class="dropdown-item">Profile</a>
+                    <hr class="dropdown-divider">
+                    <button class="dropdown-item danger" (click)="logout()">Sign Out</button>
+                </div>
+            </div>
+            <ng-container *ngIf="!auth.isLoggedIn">
+                <a routerLink="/auth/login" class="nav-link">Sign In</a>
+                <a routerLink="/auth/register" class="btn btn-primary btn-sm">Join</a>
+            </ng-container>
+        </div>
+        <button class="hamburger" (click)="mobileOpen = !mobileOpen" aria-label="Menu">
+            <span [class.open]="mobileOpen"></span>
+            <span [class.open]="mobileOpen"></span>
+            <span [class.open]="mobileOpen"></span>
+        </button>
+    </div>
+    <div class="mobile-menu" [class.open]="mobileOpen" (click)="mobileOpen = false">
+        <form class="mobile-search" (ngSubmit)="onSearch()" (click)="$event.stopPropagation()">
+            <input type="text" 
+                class="form-input" 
+                placeholder="Search..." 
+                [(ngModel)]="searchQuery"
+                name="mobileSearch" />
+            <button type="submit" class="btn btn-primary btn-sm">Go</button>
+        </form>
+        <a routerLink="/products" class="mobile-link">Shop</a>
+        <a *ngIf="auth.isCustomer" routerLink="/cart" class="mobile-link">Cart ({{ cartCount }})</a>
+        <a *ngIf="auth.isCustomer" routerLink="/orders" class="mobile-link">My Orders</a>
+        <a *ngIf="auth.isCustomer" routerLink="/profile" class="mobile-link">Profile</a>
+        <a *ngIf="auth.isAdmin" routerLink="/admin" class="mobile-link">Admin Panel</a>
+        <a *ngIf="!auth.isLoggedIn" routerLink="/auth/login" class="mobile-link">Sign In</a>
+        <a *ngIf="!auth.isLoggedIn" routerLink="/auth/register" class="mobile-link">Register</a>
+        <button *ngIf="auth.isLoggedIn" class="mobile-link danger-link" (click)="logout()">Sign Out</button>
+    </div>
+</nav>

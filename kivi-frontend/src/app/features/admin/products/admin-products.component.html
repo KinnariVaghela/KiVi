@@ -1,0 +1,151 @@
+<div class="admin-page">
+    <div class="admin-page-header">
+        <div>
+            <h1>Products</h1>
+            <p class="admin-subtitle">{{ products.length }} total products</p>
+        </div>
+        <button class="btn btn-primary" (click)="openCreate()">+ Add Product</button>
+    </div>
+
+    <app-loading *ngIf="loading" />
+
+    <!-- Product Table -->
+    <div *ngIf="!loading" class="table-wrapper fade-in">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Sub-Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of products">
+                    <td>
+                        <img [src]="getImg(p)" [alt]="p.name" class="product-thumb" (error)="onImgError($event)" />
+                    </td>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.price | currency:'INR':'symbol':'1.2-2' }}</td>
+                    <td>
+                        <span [class.low-stock]="p.stock < 5" [class.no-stock]="p.stock === 0">
+                            {{ p.stock }}
+                        </span>
+                    </td>
+                    <td>{{ p.subCategory?.name ?? p.subCategoryId }}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn btn-ghost btn-sm" (click)="openEdit(p)">Edit</button>
+                            <button class="btn btn-sm danger-btn" (click)="deleteProduct(p)">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── Product Modal ────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ editingId ? 'Edit Product' : 'Add Product' }}</h2>
+            <button class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+
+        <div class="alert alert-error" *ngIf="formError">{{ formError }}</div>
+
+        <form (ngSubmit)="saveProduct()" class="modal-form">
+            <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <input type="text" [(ngModel)]="form.name" name="name" class="form-input" required />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea [(ngModel)]="form.description" name="description" class="form-textarea" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Price *</label>
+                    <input type="number" [(ngModel)]="form.price" name="price" class="form-input" min="0" step="0.01"
+                        required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stock *</label>
+                    <input type="number" [(ngModel)]="form.stock" name="stock" class="form-input" min="0" required />
+                </div>
+            </div>
+
+            <!-- Taxonomy selector -->
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select [(ngModel)]="selectedTypeId" name="typeId" class="form-select" (change)="onTypeChange()">
+                    <option [ngValue]="null">— Select Type —</option>
+                    <option *ngFor="let t of taxonomy" [ngValue]="t.id">{{ t.name }}</option>
+                </select>
+            </div>
+            <div class="form-group" *ngIf="selectedCategories.length">
+                <label class="form-label">Category</label>
+                <select [(ngModel)]="selectedCategoryId" name="categoryId" class="form-select"
+                    (change)="onCategoryChange()">
+                    <option [ngValue]="null">— Select Category —</option>
+                    <option *ngFor="let c of selectedCategories" [ngValue]="c.id">{{ c.name }}</option>
+                </select>
+            </div>
+            <div class="form-group" *ngIf="selectedSubCategories.length">
+                <label class="form-label">Sub-Category *</label>
+                <select [(ngModel)]="form.subCategoryId" name="subCategoryId" class="form-select">
+                    <option [ngValue]="null">— Select Sub-Category —</option>
+                    <option *ngFor="let s of selectedSubCategories" [ngValue]="s.id">{{ s.name }}</option>
+                </select>
+            </div>
+
+            <!-- Or type directly if no taxonomy loaded -->
+            <div class="form-group" *ngIf="!taxonomy.length">
+                <label class="form-label">Sub-Category ID *</label>
+                <input type="number" [(ngModel)]="form.subCategoryId" name="subCategoryId" class="form-input"
+                    required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Image (JPG/PNG/WebP, max 5MB)</label>
+                <input type="file" accept="image/*" name="productImage" (change)="onFileChange($event)"
+                    class="file-input" #fileInput />
+                <img *ngIf="imagePreview" [src]="imagePreview" class="image-preview" alt="Preview" />
+            </div>
+
+            <!-- Quick taxonomy creation -->
+            <details class="taxonomy-details">
+                <summary>+ Create New Taxonomy Item</summary>
+                <div class="taxonomy-form">
+                    <div class="form-row">
+                        <input type="text" [(ngModel)]="newTypeName" name="newType" class="form-input"
+                            placeholder="New Type name" />
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="createType()">Add Type</button>
+                    </div>
+                    <div class="form-row" *ngIf="selectedTypeId">
+                        <input type="text" [(ngModel)]="newCategoryName" name="newCat" class="form-input"
+                            placeholder="New Category name" />
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="createCategory()">Add
+                            Category</button>
+                    </div>
+                    <div class="form-row" *ngIf="selectedCategoryId">
+                        <input type="text" [(ngModel)]="newSubCategoryName" name="newSub" class="form-input"
+                            placeholder="New Sub-Category name" />
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="createSubCategory()">Add
+                            Sub-Category</button>
+                    </div>
+                </div>
+            </details>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="saving">
+                    {{ saving ? 'Saving...' : (editingId ? 'Update Product' : 'Create Product') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+import { Component }       from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService }     from '../../../core/services/auth.service';
+
+@Component({
+  selector: 'app-admin-shell',
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  templateUrl: './admin-shell.component.html',
+  styleUrl: './admin-shell.component.css',
+})
+export class AdminShellComponent {
+  constructor(private auth: AuthService) {}
+  logout(): void { this.auth.logout(); }
+}

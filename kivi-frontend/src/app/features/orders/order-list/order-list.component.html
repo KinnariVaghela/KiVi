@@ -1,0 +1,41 @@
+<div class="container page-content">
+    <div class="page-header">
+        <h1>My Orders</h1>
+    </div>
+
+    <app-loading *ngIf="loading" />
+
+    <div *ngIf="!loading && orders.length === 0" class="empty-state">
+        <div class="empty-state-icon">📦</div>
+        <h3>No orders yet</h3>
+        <p>When you place orders, they'll appear here.</p>
+        <a routerLink="/products" class="btn btn-primary">Start Shopping</a>
+    </div>
+
+    <div *ngIf="!loading && orders.length > 0" class="table-wrapper fade-in">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of orders">
+                    <td><strong>#{{ order.id }}</strong></td>
+                    <td>{{ order.placedAt | date:'mediumDate' }}</td>
+                    <td>{{ order.items.length }} item(s)</td>
+                    <td>{{ order.paymentMethod }}</td>
+                    <td><strong>{{ order.totalAmount | currency:'INR':'symbol':'1.2-2' }}</strong></td>
+                    <td>
+                        <a [routerLink]="['/orders', order.id]" class="btn btn-ghost btn-sm">View</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

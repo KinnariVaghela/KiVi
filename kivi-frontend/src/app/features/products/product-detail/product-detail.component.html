@@ -1,0 +1,122 @@
+<div class="container page-content">
+
+    <app-loading *ngIf="loading" />
+
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+    <div *ngIf="product && !loading" class="detail-layout fade-in">
+
+        <nav class="breadcrumb">
+            <a routerLink="/">Home</a>
+            <span>›</span>
+            <a routerLink="/products">Shop</a>
+            <ng-container *ngIf="productType">
+                <span>›</span>
+                <a routerLink="/products" [queryParams]="{typeId: productType.id}">
+                    {{ productType.name }}
+                </a>
+            </ng-container>
+            <ng-container *ngIf="category">
+                <span>›</span>
+                <a routerLink="/products" [queryParams]="{categoryId: category.id}">
+                    {{ category.name }}
+                </a>
+            </ng-container>
+            <ng-container *ngIf="subCategory">
+                <span>›</span>
+                <a routerLink="/products" [queryParams]="{subCategoryId: subCategory.id}">
+                    {{ subCategory.name }}
+                </a>
+            </ng-container>
+            <span>›</span>
+            <span class="breadcrumb-current">{{ product.name }}</span>
+        </nav>
+
+        <div class="detail-grid">
+
+            <div class="detail-image-wrap">
+                <img [src]="imageUrl" [alt]="product.name" class="detail-image" (error)="onImgError($event)" />
+                <div class="out-of-stock-overlay" *ngIf="product.stock === 0">
+                    Out of Stock
+                </div>
+            </div>
+
+            <div class="detail-info">
+
+                <div class="taxonomy-path" *ngIf="productType || category || subCategory">
+                    <span class="taxon-tag" *ngIf="productType">{{ productType.name }}</span>
+                    <span class="taxon-sep" *ngIf="category">›</span>
+                    <span class="taxon-tag" *ngIf="category">{{ category.name }}</span>
+                    <span class="taxon-sep" *ngIf="subCategory">›</span>
+                    <span class="taxon-tag" *ngIf="subCategory">{{ subCategory.name }}</span>
+                </div>
+
+                <h1 class="detail-name">{{ product.name }}</h1>
+
+                <div class="detail-price">
+                    {{ product.price | currency:'INR':'symbol':'1.2-2' }}
+                </div>
+
+                <p class="detail-description" *ngIf="product.description">
+                    {{ product.description }}
+                </p>
+                <p class="detail-description no-desc" *ngIf="!product.description">
+                    No description available for this product.
+                </p>
+
+                <div class="stock-status">
+                    <span class="stock-dot" [class.in-stock]="product.stock > 0"></span>
+                    <span>
+                        {{ product.stock > 0 ? product.stock + ' units in stock' : 'Out of stock' }}
+                    </span>
+                </div>
+
+                <div class="detail-actions">
+
+                    <a *ngIf="!auth.isLoggedIn" routerLink="/auth/login" class="btn btn-primary btn-lg">
+                        Sign In to Buy
+                    </a>
+
+                    <ng-container *ngIf="auth.isLoggedIn && product.stock > 0">
+
+                        <div *ngIf="quantity > 0" class="qty-control-wrapper">
+                            <div class="qty-control">
+                                <button class="qty-btn" (click)="onDecrease()"
+                                    [disabled]="addingId === product.id">−</button>
+                                <span class="qty-num">{{ quantity }}</span>
+                                <button class="qty-btn" (click)="onAddToCart(product)"
+                                    [disabled]="addingId === product.id">+</button>
+                            </div>
+                            <a routerLink="/cart" class="btn btn-outline btn-lg">View Cart</a>
+                        </div>
+
+                        <button *ngIf="quantity === 0" class="btn btn-primary btn-lg"
+                            [disabled]="addingId === product.id" (click)="onAddToCart(product)">
+                            <span *ngIf="addingId === product.id" class="btn-spinner"></span>
+                            {{ addingId === product.id ? 'Adding...' : 'Add to Cart' }}
+                        </button>
+                    </ng-container>
+
+                    <button class="btn btn-ghost btn-lg" (click)="onShare()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="18" cy="5" r="3" />
+                            <circle cx="6" cy="12" r="3" />
+                            <circle cx="18" cy="19" r="3" />
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                        </svg>
+                        {{ shareLabel }}
+                    </button>
+                </div>
+
+                <div class="share-confirm" *ngIf="shared">✓ Link copied to clipboard!</div>
+                <div class="alert alert-success add-confirm" *ngIf="justAdded">✓ Added to cart!</div>
+
+                <p class="locked-note" *ngIf="auth.isLoggedIn && product.stock === 0">
+                    This product is currently out of stock.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

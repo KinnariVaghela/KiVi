@@ -1,0 +1,59 @@
+<div class="container page-content">
+    <div class="page-header">
+        <h1>Order #{{ order?.id }}</h1>
+        <a routerLink="/orders" class="back-link">← All Orders</a>
+    </div>
+
+    <app-loading *ngIf="loading" />
+
+    <div *ngIf="order && !loading" class="fade-in">
+        <div class="order-meta card" style="padding: 24px; margin-bottom: 24px;">
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">Order Date</span>
+                    <span>{{ order.placedAt | date:'fullDate' }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Payment Method</span>
+                    <span>{{ order.paymentMethod }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Order Total</span>
+                    <span class="total-val">{{ order.totalAmount | currency:'INR':'symbol':'1.2-2' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="overflow: visible;">
+            <div style="padding: 24px;">
+                <h2 style="font-size: 1.1rem; margin-bottom: 20px;">Items</h2>
+            </div>
+            <div class="table-wrapper" style="border: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price at Purchase</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of order.items">
+                            <td>{{ item.productName }}</td>
+                            <td>{{ item.priceAtPurchase | currency:'INR':'symbol':'1.2-2' }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td><strong>{{ (item.priceAtPurchase * item.quantity) | currency:'INR':'symbol':'1.2-2'
+                                    }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="order-total-row">
+                <span>Total</span>
+                <span>{{ order.totalAmount | currency:'INR':'symbol':'1.2-2' }}</span>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="error && !loading" class="alert alert-error">{{ error }}</div>
+</div>

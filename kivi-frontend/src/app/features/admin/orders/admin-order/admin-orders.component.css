@@ -1,0 +1,16 @@
+.admin-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.admin-page-header h1 {
+    font-size: 1.6rem;
+    margin-bottom: 2px;
+}
+
+.admin-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}

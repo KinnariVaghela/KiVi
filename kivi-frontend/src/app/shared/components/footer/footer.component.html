@@ -1,0 +1,26 @@
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-brand">
+            <span class="brand-ki">Ki</span><span class="brand-vi">Vi</span>
+            <p>Curated products at exceptional value.</p>
+        </div>
+        <div class="footer-links">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <a routerLink="/products">All Products</a>
+                <a routerLink="/products" [queryParams]="{inStock: 'true'}">In Stock</a>
+            </div>
+            <div class="footer-col">
+                <h4>Account</h4>
+                <a routerLink="/auth/login">Sign In</a>
+                <a routerLink="/auth/register">Register</a>
+                <a routerLink="/orders">My Orders</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container">
+            <p>&copy; {{ year }} KiVi. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

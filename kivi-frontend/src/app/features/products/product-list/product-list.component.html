@@ -1,0 +1,232 @@
+<div class="container page-content">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>{{ pageTitle }}</h1>
+    <p class="result-count" *ngIf="!loading">
+      {{ total }} product{{ total !== 1 ? "s" : "" }} found
+    </p>
+  </div>
+
+  <div class="layout">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" [class.sidebar-open]="filtersOpen">
+      <div class="sidebar-header">
+        <h3>Filters</h3>
+        <button class="sidebar-close" (click)="filtersOpen = false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="filter-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input type="text" placeholder="Search products…"
+          [(ngModel)]="filters.search" (ngModelChange)="onSearchChange()" />
+      </div>
+
+      <!-- Type -->
+      <div class="filter-group" *ngIf="taxonomy.length">
+        <div class="filter-label">Type</div>
+        <div class="filter-options">
+          <button class="filter-option" [class.active]="!filters.typeId"
+            (click)="filters.typeId = undefined; onTypeChange()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">All Types</span>
+          </button>
+          <button class="filter-option" *ngFor="let t of taxonomy"
+            [class.active]="filters.typeId === t.id"
+            (click)="filters.typeId = t.id; onTypeChange()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">{{ t.name }}</span>
+            <span class="filter-option-count">{{ t.categories.length || 0 }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="filter-group" *ngIf="currentCategories.length">
+        <div class="filter-label">Category</div>
+        <div class="filter-options">
+          <button class="filter-option" [class.active]="!filters.categoryId"
+            (click)="filters.categoryId = undefined; onCategoryChange()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">All Categories</span>
+          </button>
+          <button class="filter-option" *ngFor="let c of currentCategories"
+            [class.active]="filters.categoryId === c.id"
+            (click)="filters.categoryId = c.id; onCategoryChange()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">{{ c.name }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-Category -->
+      <div class="filter-group" *ngIf="currentSubCategories.length">
+        <div class="filter-label">Sub-Category</div>
+        <div class="filter-options">
+          <button class="filter-option" [class.active]="!filters.subCategoryId"
+            (click)="filters.subCategoryId = undefined; applyFilters()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">All Sub-Categories</span>
+          </button>
+          <button class="filter-option" *ngFor="let s of currentSubCategories"
+            [class.active]="filters.subCategoryId === s.id"
+            (click)="filters.subCategoryId = s.id; applyFilters()">
+            <div class="filter-radio"></div>
+            <span class="filter-option-name">{{ s.name }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-group">
+        <div class="filter-label">Price Range</div>
+        <div class="price-inputs">
+          <input type="number" class="form-input" placeholder="Min" min="0"
+            [(ngModel)]="filters.minPrice" (change)="applyFilters()" />
+          <span>–</span>
+          <input type="number" class="form-input" placeholder="Max" min="0"
+            [(ngModel)]="filters.maxPrice" (change)="applyFilters()" />
+        </div>
+      </div>
+
+      <!-- In Stock -->
+      <div class="filter-group">
+        <div class="toggle-row">
+          <label for="inStockToggle">In stock only</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="inStockToggle"
+              [(ngModel)]="filters.inStock" (change)="applyFilters()" />
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Active chips -->
+      <div class="active-filters" *ngIf="hasActiveFilters()">
+        <div class="filter-chip" *ngIf="filters.typeId">
+          {{ getTypeName(filters.typeId) }}
+          <button (click)="filters.typeId = undefined; onTypeChange()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="filter-chip" *ngIf="filters.categoryId">
+          {{ filters.categoryId }}
+          <button (click)="filters.categoryId = undefined; onCategoryChange()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="filter-chip" *ngIf="filters.inStock">
+          In stock
+          <button (click)="filters.inStock = false; applyFilters()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="filter-chip" *ngIf="filters.search">
+          "{{ filters.search }}"
+          <button (click)="filters.search = ''; onSearchChange()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-clear-filters" (click)="clearFilters()">Clear all filters</button>
+    </aside>
+
+    <!-- ── Products Area ── -->
+    <div class="products-area">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <button class="filter-toggle-btn" (click)="filtersOpen = !filtersOpen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <line x1="4" y1="6" x2="20" y2="6" stroke-linecap="round" />
+            <line x1="8" y1="12" x2="16" y2="12" stroke-linecap="round" />
+            <line x1="12" y1="18" x2="12" y2="18" stroke-linecap="round" stroke-width="2.5" />
+          </svg>
+          Filters
+          <span class="filter-toggle-count" *ngIf="hasActiveFilters()">{{ activeFilterCount() }}</span>
+        </button>
+
+        <div class="active-filters" *ngIf="hasActiveFilters()">
+          <span class="filter-chip" *ngIf="filters.search">
+            "{{ filters.search }}"
+            <button (click)="filters.search = ''; applyFilters()">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </span>
+          <span class="filter-chip" *ngIf="filters.inStock">
+            In stock
+            <button (click)="filters.inStock = false; applyFilters()">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </span>
+        </div>
+
+        <span class="toolbar-spacer"></span>
+
+        <select class="sort-select" [(ngModel)]="sortBy" (change)="loadProducts()">
+          <option value="">Default</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
+        </select>
+      </div>
+
+      <app-loading *ngIf="loading" />
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="!loading && products.length === 0">
+        <div class="empty-state-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.3">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search terms.</p>
+        <button class="btn btn-outline" (click)="clearFilters()">Clear Filters</button>
+      </div>
+
+      <!-- Grid -->
+      <div *ngIf="!loading && products.length > 0" class="product-grid">
+        <app-product-card
+          *ngFor="let p of products; let i = index"
+          [product]="p"
+          [showAddToCart]="auth.isCustomer"
+          [adding]="addingId === p.id"
+          [quantity]="cartQty(p.id)"
+          [style.animation-delay]="i * 0.05 + 's'"
+          (addToCart)="onAddToCart($event)"
+          (decrease)="onDecrease($event)"
+        />
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button (click)="goPage(currentPage - 1)" [disabled]="currentPage === 1">‹ Prev</button>
+        <ng-container *ngFor="let p of pageNumbers">
+          <button (click)="goPage(p)" [class.active]="p === currentPage">{{ p }}</button>
+        </ng-container>
+        <button (click)="goPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next ›</button>
+      </div>
+
+    </div>
+  </div>
+</div>

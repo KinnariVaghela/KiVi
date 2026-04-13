@@ -1,0 +1,52 @@
+.admin-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.admin-page-header h1 {
+    font-size: 1.6rem;
+    margin-bottom: 2px;
+}
+
+.admin-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.search-input {
+    max-width: 280px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--color-success-pale);
+    color: var(--color-success);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+.status-badge.locked {
+    background: var(--color-error-pale);
+    color: var(--color-error);
+    border-color: rgba(192, 57, 43, 0.2);
+}
+
+.unlock-btn {
+    background: var(--color-success-pale);
+    color: var(--color-success);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+.unlock-btn:hover {
+    background: var(--color-success);
+    color: #fff;
+}

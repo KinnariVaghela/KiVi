@@ -1,0 +1,46 @@
+<div class="auth-page">
+    <div class="auth-card fade-in-up">
+        <div class="auth-header">
+            <a routerLink="/" class="auth-logo">
+                <span class="brand-ki">Ki</span><span class="brand-vi">Vi</span>
+            </a>
+            <h1>Welcome back</h1>
+            <p>Sign in to your account to continue</p>
+        </div>
+
+        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+        <form (ngSubmit)="onSubmit()" #f="ngForm">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" [(ngModel)]="email" class="form-input" placeholder="you@example.com"
+                    required autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-password-wrap">
+                    <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password"
+                        class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+                    <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+                        {{ showPassword ? 'Hide' : 'Show' }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="forgot-row">
+                <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" [disabled]="loading">
+                <span *ngIf="loading" class="btn-spinner"></span>
+                {{ loading ? 'Signing in...' : 'Sign In' }}
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            Don't have an account?
+            <a routerLink="/auth/register">Create one</a>
+        </p>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="product-card fade-in-up">
+    <a [routerLink]="['/products', product.id]" class="card-image-link">
+        <div class="card-image-wrapper">
+            <img [src]="imageUrl" [alt]="product.name" class="card-image" (error)="onImgError($event)" />
+            <div class="card-overlay"><span>View Details</span></div>
+            <div class="out-of-stock-badge" *ngIf="product.stock === 0">Out of Stock</div>
+        </div>
+    </a>
+
+    <div class="card-body">
+        <div class="card-meta" *ngIf="categoryPath">
+            <span class="card-category">{{ categoryPath }}</span>
+        </div>
+        <a [routerLink]="['/products', product.id]" class="card-title">
+            {{ product.name }}
+        </a>
+        <div class="card-footer">
+            <span class="card-price">{{ product.price | currency:'INR':'symbol':'1.2-2' }}</span>
+            <div *ngIf="showAddToCart && product.stock > 0">
+
+                <div *ngIf="quantity > 0" class="qty-control">
+                    <button class="qty-btn" (click)="decrease.emit(product)" [disabled]="adding">−</button>
+                    <span class="qty-num">{{ quantity }}</span>
+                    <button class="qty-btn" (click)="addToCart.emit(product)" [disabled]="adding">+</button>
+                </div>
+
+                <button *ngIf="quantity === 0" class="btn-add-cart" (click)="addToCart.emit(product)"
+                    [disabled]="adding">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    {{ adding ? '...' : 'Add' }}
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
