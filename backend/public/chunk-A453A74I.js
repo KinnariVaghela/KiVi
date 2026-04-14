@@ -1,0 +1,1 @@
+import"./chunk-4CLCTAJ7.js";var t=[{path:"",loadComponent:()=>import("./chunk-5OJZ6HSQ.js").then(o=>o.OrderListComponent)},{path:":id",loadComponent:()=>import("./chunk-IK3CI5OO.js").then(o=>o.OrderDetailComponent)}];export{t as orderRoutes};

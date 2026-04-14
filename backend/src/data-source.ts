@@ -11,6 +11,7 @@ import { CartItem }           from './entity/CartItem';
 import { Order }              from './entity/Order';
 import { OrderItem }          from './entity/OrderItem';
 import { PasswordResetCode }  from './entity/PasswordResetCode';
+import path from 'path/win32';
 
 Dotenv.config();
 
@@ -21,11 +22,14 @@ Dotenv.config();
 export const AppDataSource = new DataSource({
   type:        'better-sqlite3',
   database:    process.env.DB_NAME || 'ecommerce-db',
-  synchronize: process.env.DB_SYNCHRONIZE === 'true', 
+  // synchronize: process.env.DB_SYNCHRONIZE === 'true', 
+  synchronize: false,
   logging:     process.env.DB_LOGGING === 'true',
-  entities: [
-    User, ProductType, Category, SubCategory,
-    Product, CartItem, Order, OrderItem, PasswordResetCode,
-  ],
-  migrations: ['src/migration/*.ts'],
+  // entities: [
+  //   User, ProductType, Category, SubCategory,
+  //   Product, CartItem, Order, OrderItem, PasswordResetCode,
+  // ],
+  // migrations: ['src/migration/*.ts'],
+  entities: [path.join(__dirname, 'entity/**/*.{js,ts}')],
+  migrations: [path.join(__dirname, 'migration/**/*.{js,ts}')],
 });

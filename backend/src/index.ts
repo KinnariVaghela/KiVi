@@ -5,7 +5,7 @@ import express   from 'express';
 import cookieParser from 'cookie-parser';
 import path      from 'path';
 import { AppDataSource } from './data-source';
-import './passport';         
+import './passport';   
 
 // Routes
 import authRoutes    from './routes/auth';
@@ -64,11 +64,8 @@ app.use(cookieParser());
  */
 app.use(
   '/ProductImages',
-  express.static(path.join(__dirname, '../ProductImages')),
+  express.static(path.join(__dirname, '..', 'ProductImages')),
 );
-
-const angularDist = path.join(__dirname, '../../frontend/dist/frontend/browser');
-app.use(express.static(angularDist));
 
 app.use('/api/auth',     authRoutes);
 app.use('/api/products', productRoutes);
@@ -91,18 +88,58 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
 });
 
+import fs from 'fs';
+
+const angularDistRoot = path.join(__dirname, "../../kivi-frontend/dist/kivi-frontend");
+const angularBrowserPath = path.join(angularDistRoot, "browser");
+
+const angularDistPath = fs.existsSync(angularBrowserPath) 
+    ? angularBrowserPath 
+    : angularDistRoot;
+
+console.log("Checking Angular path:", angularDistPath);
+if (!fs.existsSync(angularDistPath)) {
+    console.error("ERROR: Angular build folder not found at the calculated path!");
+}
+
+app.use(express.static(angularDistPath));
+
+app.get(/^\/(?!api).*/, (req, res) => {
+    const indexPath = path.join(angularDistPath, "index.html");
+    
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send("index.html not found. Check your FRONT_END path logic.");
+    }
+});
+
 /**
  * Database & Server Lifecycle
  * Initializes TypeORM connection before opening the network port.
  */
-AppDataSource.initialize()
-  .then(() => {
+const startServer = async () => {
+  try {
+    await AppDataSource.initialize();
     console.log('Database connected');
-    app.listen(PORT, () =>
-      console.log(`Server running → http://localhost:${PORT}`),
-    );
-  })
-  .catch((err) => {
-    console.error('Failed to connect to database:', err);
+
+    const server = app.listen(PORT, () => {
+      console.log(`Server active at: http://localhost:${PORT}`);
+    });
+
+    server.on('error', (err: any) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Kill the other process or change the PORT in .env`);
+      } else {
+        console.error('Server error:', err);
+      }
+      process.exit(1);
+    });
+
+  } catch (err) {
+    console.error('Failed to initialize database:', err);
     process.exit(1);
-  });
+  }
+};
+
+startServer();
